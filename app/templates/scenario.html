@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Scenario Grid{% endblock %}
+
+{% block content %}
+
+<h1>Scenario Grid</h1>
+
+<div class="grid-wrapper">
+    <div class="grid-container">
+        {% for row in grid_rows %}
+            {% for number in row %}
+                <div class="tile">{{ number }}</div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

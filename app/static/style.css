@@ -1,0 +1,175 @@
+/* Wrap all main buttons/forms on index page */
+.page-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;             /* more space between buttons/forms */
+    margin-top: 40px;
+    width: 100%;
+    max-width: 400px;      /* keeps content narrow */
+}
+
+/* Buttons inside page-buttons and custom file button */
+.page-buttons button,
+.custom-file-button {
+    width: 100%;           /* stretch buttons to container width */
+    max-width: 250px;      /* optional max width */
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: none;
+    background-color: #155724;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.2s ease;
+}
+
+.page-buttons button:hover,
+.custom-file-button:hover {
+    background-color: #0b3d12;
+}
+
+/* Display selected file name neatly */
+#file-name {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 14px;
+    color: #333;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* You need this to hide the default file input */
+.file-upload-form input[type="file"] {
+    display: none;
+}
+
+/* Wrap label + upload button horizontally with spacing */
+.file-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;   /* space between choose and upload buttons */
+    margin-bottom: 10px; /* optional vertical spacing */
+}
+
+/* Optional: make the upload button match the other buttons */
+.file-upload-wrapper .upload-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: none;
+    background-color: #155724;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.file-upload-wrapper .upload-btn:hover {
+    background-color: #0b3d12;
+}
+
+/* OCR button in grey - make sure to override page-buttons button */
+.page-buttons .ocr-btn {
+    background-color: #6c757d !important; /* grey */
+    color: white !important;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.page-buttons .ocr-btn:hover {
+    background-color: #5a6268 !important; /* darker grey on hover */
+}
+
+#extract-plumber {
+    width: 100%;
+    max-width: 250px;
+    padding: 12px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#extract-plumber:hover {
+    background-color: #0056b3;
+}
+
+/* Flash-style messages */
+.flash-messages {
+    list-style: none;
+    padding: 0;
+    margin: 30px 0 0 0;  /* more vertical spacing above messages */
+    text-align: center;
+}
+
+.flash-messages li {
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 5px 0;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.flash-messages li.success { background-color: #d4edda; color: #155724; }
+.flash-messages li.error   { background-color: #f8d7da; color: #721c24; }
+.flash-messages li.info    { background-color: #d1ecf1; color: #0c5460; }
+
+/* Vertically center all index page content */
+.page-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    gap: 25px;
+}
+
+/* Grid wrapper to center background around grid */
+.grid-wrapper {
+    display: flex;
+    justify-content: center; /* centers the grid horizontally */
+    padding: 20px;           /* space around the grid */
+    background-color: #f0f0f0; /* background color around the grid only */
+    border-radius: 10px;
+    max-width: fit-content;   /* shrink-wrap to the grid size */
+    margin: 20px auto;        /* center on page and add vertical spacing */
+}
+
+/* Grid container with tiles (no background here now) */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(10, 50px);
+    grid-auto-rows: 50px;
+    gap: 5px;
+}
+
+
+.tile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #d4edda;
+    border: 2px solid #155724;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 5px;
+}
+/* Optional: checkerboard effect */
+.tile:nth-child(even) { background-color: #c8e6c9; }
+.tile:nth-child(odd)  { background-color: #d4edda; }
+
+/* Title for grid page */
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
