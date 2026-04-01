@@ -7,3 +7,4 @@ pdf2image          1.17.0
 Flask              3.1.3
 pdfplumber         0.11.9
 pillow             12.1.1
+pytesseract        0.3.13
