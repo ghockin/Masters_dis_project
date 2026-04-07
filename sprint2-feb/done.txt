@@ -1,0 +1,13 @@
+-User flow diagram
+-maneuver mechanic flow diagram
+-Basic app running
+-ocr implemented and working
+-scenario templated document designed
+-scenario template document download mechanic implemented
+-scenario upload document mechanic implemented
+-user testing/ quality assurance complete
+-using a git for file safety.
+-template for the simulation implemented.
+-template document with likely surrounding text and images.
+-ocr pre-processing applied (bounding boxs).
+-ocr failsafe, use pdfplumber option.

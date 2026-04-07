@@ -1,0 +1,27 @@
+Bronze data:
+// data from scan
+Scenario info: date, file no, subject.
+Mission brief: speed, start location, end location.
+intel summary (unit2): name, speed, start location, end location.
+operative: name(unit1).
+
+Sliver data:
+//take bronze data and clean the strings to populate a dictionary named Scenario data.
+// Scenario Data should be a dictionary which has:
+{
+0: Scenario info: Date, File no, subject.
+1: Unit 1: name, speed, start location, end location.
+2: Unit 2: name, speed, start location, end location.
+}
+// Populate Scenario info: key words to look for in output Date: FILE NO: SUBJECT: 
+// Populate Unit 1: in 1 Mission Brief look for: Last sighted co-ordinates (). Move to co-ordinates (). At a speed of $ knots. 
+// Populate Unit 2: in 2. Intel summary look for: Class: NAME. Last sighted co-ordinates (). Move to co-ordinates (). At a speed of $ knots. 
+// Populate Unit 1: in 3. Operative look for: Class: NAME.
+
+Gold data:
+//Save data frame to database ready for use.
+
+//DataBase should have this data
+Scenario info: date, file no, subject.
+unit 1: name, speed, start location, end location.
+unit 2: name, speed, start location, end location.
