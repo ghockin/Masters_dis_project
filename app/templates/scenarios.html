@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Available Scenarios{% endblock %}
+
+{% block content %}
+<h1>Available Scenarios</h1>
+
+{% if not mutations_exist %}
+    <form method="POST" action="/create-mutations" style="margin-bottom: 20px;">
+        <button type="submit">Create Mutations</button>
+    </form>
+{% else %}
+    <p>Mutations already created ({{ mutation_count }})</p>
+{% endif %}
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for scenario in scenarios %}
+        <tr>
+            <td>{{ scenario.id }}</td>
+            <td>{{ scenario.scenario_name or ("Scenario " ~ scenario.id) }}</td>
+            <td>
+                {% if scenario.is_mutation == 1 %}
+                    Mutation
+                {% else %}
+                    Original
+                {% endif %}
+            </td>
+            <td>{{ scenario.date }}</td>
+            <td>
+                <a href="/view-scenario?scenario_id={{ scenario.id }}">Run</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

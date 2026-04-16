@@ -1,22 +1,27 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, send_file, jsonify
 from pdf2image import convert_from_path
 import pytesseract
 import pdfplumber
 from PIL import ImageDraw
 import os
+
 from data_organise import populate_data_frame
-from database import get_all_scenarios, get_scenario_by_id
-from run_simulation import SimulationState   # <-- import class
+from database import (
+    get_all_scenarios,
+    get_scenario_by_id,
+    create_mutations,
+    has_mutations,
+    get_mutation_count,
+)
+from run_simulation import SimulationState
 
-
-
-# import paths from config.py
-from config import POPPLER_PATH, SCENARIO_TEMPLATE, TESSERACT_PATH, OUTPUT_FILE, DEBUG_DIR, UPLOAD_FOLDER, OCR_BOXES
+from config import POPPLER_PATH, SCENARIO_TEMPLATE, OUTPUT_FILE, DEBUG_DIR, UPLOAD_FOLDER, OCR_BOXES
 
 main = Blueprint("main", __name__)
 sim = None
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 
 @main.get("/")
 def index():
@@ -43,6 +48,7 @@ def upload_pdf():
 
     return jsonify({"message": f"PDF '{file.filename}' uploaded successfully.", "category": "success"})
 
+
 @main.post("/extract-ocr")
 def extract_ocr():
     file = request.files.get("pdf")
@@ -64,7 +70,8 @@ def extract_ocr():
                 text = pytesseract.image_to_string(cropped).strip()
                 page_text[field] = text
                 draw.rectangle(coords, outline="green", width=3)
-                draw.text((coords[0], coords[1]-15), field, fill="green")
+                draw.text((coords[0], coords[1] - 15), field, fill="green")
+
             image.save(os.path.join(DEBUG_DIR, f"page_{page_num}_debug.png"))
 
             extracted_text += f"--- Page {page_num} ---\n"
@@ -74,11 +81,12 @@ def extract_ocr():
 
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
             f.write(extracted_text)
-        
+
         populate_data_frame(OUTPUT_FILE)
         return jsonify({"message": f"PDF text extracted successfully with OCR! Saved to {OUTPUT_FILE}", "category": "success"})
     except Exception as e:
         return jsonify({"message": f"OCR failed: {e}", "category": "error"})
+
 
 @main.post("/upload-scenario-pdfplumber")
 def extract_pdfplumber():
@@ -98,14 +106,45 @@ def extract_pdfplumber():
 
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
             f.write(extracted_text)
-        
-        
-        populate_data_frame(OUTPUT_FILE)
-        # ✅ Return JSON with success category
-        return jsonify({"message": f"PDF text extracted successfully with pdfplumber! Saved to {OUTPUT_FILE}", "category": "success"})
 
+        populate_data_frame(OUTPUT_FILE)
+        return jsonify({"message": f"PDF text extracted successfully with pdfplumber! Saved to {OUTPUT_FILE}", "category": "success"})
     except Exception as e:
         return jsonify({"message": f"pdfplumber extraction failed: {e}", "category": "error"})
+
+
+@main.get("/scenarios")
+def scenarios():
+    scenarios = get_all_scenarios()
+    mutations_exist = has_mutations()
+    mutation_count = get_mutation_count()
+
+    return render_template(
+        "scenarios.html",
+        scenarios=scenarios,
+        mutations_exist=mutations_exist,
+        mutation_count=mutation_count
+    )
+
+
+@main.post("/create-mutations")
+def create_mutations_route():
+    if not has_mutations():
+        create_mutations()
+    return redirect(url_for("main.scenarios"))
+
+
+@main.get("/view-scenario")
+def view_scenario():
+    global sim
+
+    scenario_id = request.args.get("scenario_id")
+    scenario = get_scenario_by_id(int(scenario_id))
+
+    sim = SimulationState(scenario)
+
+    return render_template("simulation.html", sim=sim)
+
 
 @main.get("/state")
 def state():
@@ -118,19 +157,11 @@ def state():
         "tick": sim.tick_count,
         "enemy": sim.enemy,
         "friendly": sim.friendly,
-        "finished": sim.finished
+        "friendly_target": list(sim.friendly_destination),
+        "friendly_path": [list(p) for p in sim.friendly_path],
+        "finished": sim.finished,
+        "destroyed": sim.friendly_destroyed
     }
-
-@main.get("/view-scenario")
-def view_scenario():
-    global sim
-
-    scenario_id = request.args.get("scenario_id")
-    scenario = get_scenario_by_id(int(scenario_id))
-
-    sim = SimulationState(scenario)
-
-    return render_template("simulation.html", sim=sim)
 
 
 @main.post("/tick")
@@ -146,7 +177,10 @@ def tick():
         "tick": sim.tick_count,
         "enemy": sim.enemy,
         "friendly": sim.friendly,
-        "finished": sim.finished
+        "friendly_target": list(sim.friendly_destination),
+        "friendly_path": [list(p) for p in sim.friendly_path],
+        "finished": sim.finished,
+        "destroyed": sim.friendly_destroyed
     }
 
 
@@ -160,11 +194,3 @@ def reset():
     sim = SimulationState(sim.scenario)
 
     return {"ok": True}
-
-    
-    
-    
-@main.route("/view_database_scenarios")
-def view_database_scenarios():
-    data = get_all_scenarios()
-    return render_template("view_database_scenarios.html", scenarios=data)
