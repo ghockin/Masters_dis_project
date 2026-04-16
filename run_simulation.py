@@ -1,4 +1,6 @@
 import ast
+import csv
+import os
 
 class SimulationState:
     def __init__(self, scenario):
@@ -9,6 +11,18 @@ class SimulationState:
         self.enemy_progress = 0.0
         self.friendly_progress = 0.0
         self.load_scenario(scenario)
+        self.log_file = f"logs/sim_{scenario['id']}.csv"
+        os.makedirs("logs", exist_ok=True)
+
+        with open(self.log_file, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                "tick",
+                "enemy_x", "enemy_y",
+                "friendly_x", "friendly_y",
+                "enemy_speed",
+                "friendly_speed"
+            ])
 
     def load_scenario(self, s):
         self.enemy = list(ast.literal_eval(s["enemy_last_seen"]))
@@ -22,6 +36,11 @@ class SimulationState:
 
         self.enemy_speed = int(s["enemy_speed"])
         self.friendly_speed = int(s["friendly_speed"])
+        
+        # ✅ ADD THESE
+        self.mission_brief = s["mission_brief"]
+        self.intel_summary = s["intel_summary"]
+        self.date = s["date"]
 
     def tick(self):
         if self.finished:
@@ -49,6 +68,16 @@ class SimulationState:
 
         if enemy_done and friendly_done:
             self.finished = True
+            
+        with open(self.log_file, "a", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                self.tick_count,
+                self.enemy[0], self.enemy[1],
+                self.friendly[0], self.friendly[1],
+                self.enemy_speed,
+                self.friendly_speed
+            ])
 
     def move_towards(self, pos, target, speed):
         if pos == list(target):

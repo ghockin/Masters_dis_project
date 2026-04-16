@@ -1,10 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %}Scenario Grid{% endblock %}
+{% block title %}
+{{ sim.date }} — {{ sim.enemy_class }} vs {{ sim.friendly_class }}
+{% endblock %}
 
 {% block content %}
 
-<h1>Scenario Grid</h1>
+<h1>
+    {{ sim.date }} — {{ sim.enemy_class }} vs {{ sim.friendly_class }}
+</h1>
+
+<p>
+    {{ sim.mission_brief }}
+</p>
+
+<p>
+    {{ sim.intel_summary }}
+</p>
 
 <button onclick="startSimulation()">Play</button>
 <button onclick="stopSimulation()">Pause</button>
@@ -35,27 +47,27 @@ let interval = null;
 
 function render(state) {
 
-    // 1. restore original grid numbers (NOT clearing everything)
+	// restore base grid
     document.querySelectorAll(".tile").forEach(tile => {
         tile.innerText = tile.dataset.base;
     });
 
-    // 2. draw enemy
+    // enemy
     const ex = state.enemy[0];
     const ey = state.enemy[1];
 
     const enemyCell = document.getElementById(`cell-${ex}-${ey}`);
     if (enemyCell) {
-        enemyCell.innerText = "E";
+        enemyCell.innerHTML = `<img src="/static/images/enemy.png" class="unit">`;
     }
 
-    // 3. draw friendly
+    // friendly
     const fx = state.friendly[0];
     const fy = state.friendly[1];
 
     const friendlyCell = document.getElementById(`cell-${fx}-${fy}`);
     if (friendlyCell) {
-        friendlyCell.innerText = "F";
+        friendlyCell.innerHTML = `<img src="/static/images/friendly.png" class="unit">`;
     }
 }
 
