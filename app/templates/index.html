@@ -28,9 +28,10 @@
     <button type="button" id="extract-plumber">Extract PDF with pdfplumber</button>
 
     <!-- Create scenario button -->
-    <form id="create-scenario-form" action="/create-scenario" method="post">
-        <button type="submit">Create scenario</button>
-    </form>
+	<form method="GET" action="/view-scenario">
+		<input name="scenario_id" placeholder="Enter Scenario ID">
+		<button type="submit">Load Scenario</button>
+	</form>
 
 </div>
 

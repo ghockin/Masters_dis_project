@@ -99,3 +99,14 @@ def get_all_scenarios():
 
     conn.close()
     return rows
+    
+    
+def get_scenario_by_id(scenario_id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,))
+    row = cursor.fetchone()
+
+    conn.close()
+    return row

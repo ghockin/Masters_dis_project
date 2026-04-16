@@ -5,13 +5,16 @@ import pdfplumber
 from PIL import ImageDraw
 import os
 from data_organise import populate_data_frame
-from database import get_all_scenarios
+from database import get_all_scenarios, get_scenario_by_id
+from run_simulation import SimulationState   # <-- import class
+
+
 
 # import paths from config.py
 from config import POPPLER_PATH, SCENARIO_TEMPLATE, TESSERACT_PATH, OUTPUT_FILE, DEBUG_DIR, UPLOAD_FOLDER, OCR_BOXES
 
 main = Blueprint("main", __name__)
-
+sim = None
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -104,22 +107,61 @@ def extract_pdfplumber():
     except Exception as e:
         return jsonify({"message": f"pdfplumber extraction failed: {e}", "category": "error"})
 
+@main.get("/state")
+def state():
+    global sim
+
+    if sim is None:
+        return {"error": "no active simulation"}
+
+    return {
+        "tick": sim.tick_count,
+        "enemy": sim.enemy,
+        "friendly": sim.friendly,
+        "finished": sim.finished
+    }
+
+@main.get("/view-scenario")
+def view_scenario():
+    global sim
+
+    scenario_id = request.args.get("scenario_id")
+    scenario = get_scenario_by_id(int(scenario_id))
+
+    sim = SimulationState(scenario)
+
+    return render_template("simulation.html", sim=sim)
+
+
+@main.post("/tick")
+def tick():
+    global sim
+
+    if sim is None:
+        return {"error": "no simulation"}, 400
+
+    sim.tick()
+
+    return {
+        "tick": sim.tick_count,
+        "enemy": sim.enemy,
+        "friendly": sim.friendly,
+        "finished": sim.finished
+    }
+
+
+@main.post("/reset")
+def reset():
+    global sim
+
+    if sim is None:
+        return {"error": "no simulation"}, 400
+
+    sim = SimulationState(sim.scenario)
+
+    return {"ok": True}
+
     
-@main.post("/create-scenario")
-def create_scenario():
-    # For demo, generate a 10x10 grid of numbers 1-100
-    grid_numbers = [i for i in range(1, 101)]
-    
-    # Split into rows of 10
-    grid_rows = [grid_numbers[i:i+10] for i in range(0, 100, 10)]
-    
-    # Render new template
-    return render_template("scenario.html", grid_rows=grid_rows)
-    
-    
-@main.get("/scenarios")
-def view_scenarios():
-    return render_template("scenario_database.html", rows=rows)
     
     
 @main.route("/view_database_scenarios")

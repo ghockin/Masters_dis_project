@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Scenario Grid{% endblock %}
+
+{% block content %}
+
+<h1>Scenario Grid</h1>
+
+<button onclick="startSimulation()">Play</button>
+<button onclick="stopSimulation()">Pause</button>
+<button onclick="resetSim()">Reset</button>
+
+<h2 id="tick">Tick: {{ sim.tick_count }}</h2>
+
+<div id="status"></div>
+
+<div class="grid-container">
+    {% for y in range(10) %}
+        {% for x in range(10) %}
+            <div class="tile"
+                 id="cell-{{ x }}-{{ y }}"
+                 data-base="{{ x }},{{ y }}">
+                {{ x }},{{ y }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let running = false;
+let interval = null;
+
+function render(state) {
+
+    // 1. restore original grid numbers (NOT clearing everything)
+    document.querySelectorAll(".tile").forEach(tile => {
+        tile.innerText = tile.dataset.base;
+    });
+
+    // 2. draw enemy
+    const ex = state.enemy[0];
+    const ey = state.enemy[1];
+
+    const enemyCell = document.getElementById(`cell-${ex}-${ey}`);
+    if (enemyCell) {
+        enemyCell.innerText = "E";
+    }
+
+    // 3. draw friendly
+    const fx = state.friendly[0];
+    const fy = state.friendly[1];
+
+    const friendlyCell = document.getElementById(`cell-${fx}-${fy}`);
+    if (friendlyCell) {
+        friendlyCell.innerText = "F";
+    }
+}
+
+function startSimulation() {
+    if (running) return;
+    running = true;
+
+    interval = setInterval(async () => {
+
+        // 1. advance simulation
+        await fetch("/tick", { method: "POST" });
+
+        // 2. get latest state
+        const state = await fetch("/state").then(r => r.json());
+
+        // 3. update tick display
+        document.getElementById("tick").innerText = "Tick: " + state.tick;
+
+        // 4. render grid
+        render(state);
+
+        // 5. stop if finished
+        if (state.finished) {
+            stopSimulation();
+            document.getElementById("status").innerText = "Simulation Complete";
+        }
+
+    }, 500);
+}
+
+function stopSimulation() {
+    running = false;
+    clearInterval(interval);
+}
+
+function resetSim() {
+    fetch("/reset", { method: "POST" })
+        .then(() => location.reload());
+}
+</script>
+{% endblock %}
