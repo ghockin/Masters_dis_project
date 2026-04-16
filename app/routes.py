@@ -4,6 +4,8 @@ import pytesseract
 import pdfplumber
 from PIL import ImageDraw
 import os
+from data_organise import populate_data_frame
+from database import get_all_scenarios
 
 # import paths from config.py
 from config import POPPLER_PATH, SCENARIO_TEMPLATE, TESSERACT_PATH, OUTPUT_FILE, DEBUG_DIR, UPLOAD_FOLDER, OCR_BOXES
@@ -69,7 +71,8 @@ def extract_ocr():
 
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
             f.write(extracted_text)
-
+        
+        populate_data_frame(OUTPUT_FILE)
         return jsonify({"message": f"PDF text extracted successfully with OCR! Saved to {OUTPUT_FILE}", "category": "success"})
     except Exception as e:
         return jsonify({"message": f"OCR failed: {e}", "category": "error"})
@@ -92,7 +95,9 @@ def extract_pdfplumber():
 
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
             f.write(extracted_text)
-
+        
+        
+        populate_data_frame(OUTPUT_FILE)
         # ✅ Return JSON with success category
         return jsonify({"message": f"PDF text extracted successfully with pdfplumber! Saved to {OUTPUT_FILE}", "category": "success"})
 
@@ -110,3 +115,14 @@ def create_scenario():
     
     # Render new template
     return render_template("scenario.html", grid_rows=grid_rows)
+    
+    
+@main.get("/scenarios")
+def view_scenarios():
+    return render_template("scenario_database.html", rows=rows)
+    
+    
+@main.route("/view_database_scenarios")
+def view_database_scenarios():
+    data = get_all_scenarios()
+    return render_template("view_database_scenarios.html", scenarios=data)
