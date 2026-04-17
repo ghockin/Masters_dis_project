@@ -1,65 +1,50 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Scenarios</title>
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
+{% extends "base.html" %}
 
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-            font-family: Arial;
-            font-size: 14px;
-        }
+{% block title %}Database View{% endblock %}
 
-        th {
-            background: #f4f4f4;
-        }
-    </style>
-</head>
+{% block content %}
+<h1>Database View</h1>
 
-<body>
-
-<h2>Scenario Database</h2>
-
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Date</th>
-        <th>Mission Brief</th>
-        <th>Intel</th>
-        <th>Start</th>
-        <th>Destination</th>
-        <th>Enemy Seen</th>
-        <th>Enemy Predicted</th>
-        <th>Enemy Class</th>
-        <th>Friendly Class</th>
-        <th>Enemy Speed</th>
-        <th>Friendly Speed</th>
-    </tr>
-
-    {% for s in scenarios %}
-    <tr>
-        <td>{{ s.id }}</td>
-        <td>{{ s.date }}</td>
-        <td>{{ s.mission_brief }}</td>
-        <td>{{ s.intel_summary }}</td>
-        <td>{{ s.start_coord }}</td>
-        <td>{{ s.destination_coord }}</td>
-        <td>{{ s.enemy_last_seen }}</td>
-        <td>{{ s.enemy_predicted }}</td>
-        <td>{{ s.enemy_class }}</td>
-        <td>{{ s.friendly_class }}</td>
-        <td>{{ s.enemy_speed }}</td>
-        <td>{{ s.friendly_speed }}</td>
-    </tr>
-    {% endfor %}
-
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Mutation</th>
+            <th>Date</th>
+            <th>Mission Brief</th>
+            <th>Intel Summary</th>
+            <th>Start</th>
+            <th>Destination</th>
+            <th>Enemy Seen</th>
+            <th>Enemy Predicted</th>
+            <th>Enemy Class</th>
+            <th>Friendly Class</th>
+            <th>Enemy Speed</th>
+            <th>Friendly Speed</th>
+            <th>Friendly Evasion Interval</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for scenario in scenarios %}
+        <tr>
+            <td>{{ scenario.id }}</td>
+            <td>{{ scenario.scenario_name }}</td>
+            <td>{{ scenario.is_mutation }}</td>
+            <td>{{ scenario.date }}</td>
+            <td>{{ scenario.mission_brief }}</td>
+            <td>{{ scenario.intel_summary }}</td>
+            <td>{{ scenario.start_coord }}</td>
+            <td>{{ scenario.destination_coord }}</td>
+            <td>{{ scenario.enemy_last_seen }}</td>
+            <td>{{ scenario.enemy_predicted }}</td>
+            <td>{{ scenario.enemy_class }}</td>
+            <td>{{ scenario.friendly_class }}</td>
+            <td>{{ scenario.enemy_speed }}</td>
+            <td>{{ scenario.friendly_speed }}</td>
+            <td>{{ scenario.friendly_evasion_interval }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
-
-</body>
-</html>
+{% endblock %}

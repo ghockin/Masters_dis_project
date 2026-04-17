@@ -11,12 +11,21 @@ class SimulationState:
         self.finished = False
         self.friendly_destroyed = False
 
+        self.enemy_tracking_interval = 14 # make this higher to give ship more of a chance The enemy will chase outdated positions longer, overshoot more.
+        self.enemy_tracking_counter = 0
+
         self.enemy_progress = 0.0
         self.friendly_progress = 0.0
+        self.speed_scale = 100.0
+
         self.friendly_move_counter = 0
         self.last_evasion_trigger = 0
 
+        # ✅ LOAD DATA FIRST
         self.load_scenario(scenario)
+
+        # ✅ NOW friendly exists → safe to use
+        self.enemy_target = tuple(self.friendly)
 
         # trail history
         self.friendly_path = [tuple(self.friendly)]
@@ -40,7 +49,7 @@ class SimulationState:
                 "friendly_evasion_interval",
                 "friendly_destroyed"
             ])
-
+            
     def load_scenario(self, s):
         self.enemy = list(ast.literal_eval(s["enemy_last_seen"]))
         self.friendly = list(ast.literal_eval(s["start_coord"]))
@@ -65,15 +74,20 @@ class SimulationState:
             return
 
         self.tick_count += 1
-
+        # update enemy tracking every N ticks
+        self.enemy_tracking_counter += 1
+        if self.enemy_tracking_counter >= self.enemy_tracking_interval:
+            self.enemy_target = tuple(self.friendly)
+            self.enemy_tracking_counter = 0
+            
         # speed accumulator model
-        self.enemy_progress += self.enemy_speed / 10.0
-        self.friendly_progress += self.friendly_speed / 10.0
+        self.enemy_progress += self.enemy_speed / self.speed_scale 
+        self.friendly_progress += self.friendly_speed / self.speed_scale
 
         while self.enemy_progress >= 1.0 or self.friendly_progress >= 1.0:
             # enemy always chases current friendly position
             if self.enemy_progress >= 1.0:
-                self.move_step(self.enemy, tuple(self.friendly))
+                self.move_step(self.enemy, self.enemy_target)
                 self.enemy_progress -= 1.0
 
                 if self.enemy == self.friendly:
@@ -181,7 +195,7 @@ class SimulationState:
                 self.tick_count,
                 self.enemy[0], self.enemy[1],
                 self.friendly[0], self.friendly[1],
-                self.friendly[0], self.friendly[1],
+                self.enemy_target[0], self.enemy_target[1],
                 self.friendly_destination[0], self.friendly_destination[1],
                 self.enemy_speed,
                 self.friendly_speed,

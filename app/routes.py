@@ -194,3 +194,10 @@ def reset():
     sim = SimulationState(sim.scenario)
 
     return {"ok": True}
+    
+    
+    
+@main.get("/db-view")
+def db_view():
+    scenarios = get_all_scenarios()
+    return render_template("view_database_scenarios.html", scenarios=scenarios)

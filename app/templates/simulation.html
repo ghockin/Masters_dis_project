@@ -83,12 +83,15 @@ function render(state) {
 		enemyCell.innerHTML = `<img src="/static/images/enemy.png" class="unit" alt="Enemy">`;
 	}
 
-	// draw friendly
-	const fx = state.friendly[0];
-	const fy = state.friendly[1];
-	const friendlyCell = document.getElementById(`cell-${fx}-${fy}`);
-	if (friendlyCell) {
-		friendlyCell.innerHTML = `<img src="/static/images/friendly.png" class="unit" alt="Friendly">`;
+	// draw friendly ONLY if not destroyed
+	if (!state.destroyed) {
+		const fx = state.friendly[0];
+		const fy = state.friendly[1];
+
+		const friendlyCell = document.getElementById(`cell-${fx}-${fy}`);
+		if (friendlyCell) {
+			friendlyCell.innerHTML = `<img src="/static/images/friendly.png" class="unit" alt="Friendly">`;
+		}
 	}
 }
 
